@@ -18,7 +18,7 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b pb-4 gap-4">
       <div>
         <h1 class="text-2xl font-bold text-slate-800">Contatti Casa Mare Nazioni</h1>
-        <p class="text-xs text-slate-500 mt-1">Gestione e consultazione contatti integrata</p>
+        <p class="text-xs text-slate-500 mt-1">Gestione, ricerca e comunicazioni rapide</p>
       </div>
       <button id="authBtn" onclick="handleAuth()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-lg transition shadow-sm">
         Connetti Google
@@ -28,7 +28,7 @@
     <!-- Status Box -->
     <div id="status" class="hidden mb-6 p-4 rounded-lg bg-slate-50 text-slate-700 border text-sm"></div>
 
-    <!-- Control Panel (Nascosto prima del caricamento) -->
+    <!-- Control Panel -->
     <div id="controlsPanel" class="hidden mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
       
       <!-- Barra di ricerca -->
@@ -79,13 +79,11 @@
     let rawContacts = [];
     let processedContacts = [];
 
-    // Mappatura principali prefissi telefonici -> Nazione
     function getCountryFromPhone(phone) {
       if (!phone || phone === 'Nessun Telefono') return { name: 'Italia', flag: '🇮🇹' };
       
       const cleaned = phone.replace(/[\s\-\(\)]/g, '');
       
-      // Se non inizia con + o 00, si assume prefisso italiano locale
       if (!cleaned.startsWith('+') && !cleaned.startsWith('00')) {
         return { name: 'Italia', flag: '🇮🇹' };
       }
@@ -191,12 +189,34 @@
       });
     }
 
+    function openWhatsApp(phone, name) {
+      if (!phone || phone === 'Nessun Telefono') {
+        alert('Nessun numero di telefono valido per questo contatto.');
+        return;
+      }
+
+      let digits = phone.replace(/[^\d+]/g, '');
+
+      if (digits.startsWith('00')) {
+        digits = '+' + digits.slice(2);
+      }
+
+      if (!digits.startsWith('+')) {
+        digits = '+39' + digits; // Prefisso Italia di default
+      }
+
+      const cleanNum = digits.replace('+', '');
+      const text = encodeURIComponent(`Gentile ${name}, le scriviamo da Casa Mare Nazioni.`);
+      const url = `https://wa.me/${cleanNum}?text=${text}`;
+
+      window.open(url, '_blank');
+    }
+
     function render() {
       const search = document.getElementById('searchInput').value.toLowerCase().trim();
       const sortType = document.getElementById('sortSelect').value;
       const selectedCountry = document.getElementById('countryFilter').value;
 
-      // 1. Filtro Ricerca & Nazione
       let list = processedContacts.filter(c => {
         const matchesSearch = c.displayName.toLowerCase().includes(search) ||
                               c.email.toLowerCase().includes(search) ||
@@ -208,7 +228,6 @@
         return matchesSearch && matchesCountry;
       });
 
-      // 2. Ordinamento
       list.sort((a, b) => {
         if (sortType === 'name_asc') {
           return a.displayName.localeCompare(b.displayName);
@@ -224,7 +243,6 @@
         return 0;
       });
 
-      // 3. Render GPU / DOM
       const container = document.getElementById('contactsList');
       container.innerHTML = '';
 
@@ -238,6 +256,9 @@
       list.forEach(c => {
         const card = document.createElement('div');
         card.className = 'p-4 border rounded-xl bg-slate-50 hover:bg-white hover:shadow-md transition flex flex-col justify-between border-slate-200';
+        
+        const hasPhone = c.phone && c.phone !== 'Nessun Telefono';
+
         card.innerHTML = `
           <div>
             <div class="flex justify-between items-start mb-2">
@@ -252,6 +273,15 @@
             <p class="text-xs text-slate-600 mt-1 flex items-center gap-1.5">
               📞 <span class="font-mono">${c.phone}</span>
             </p>
+          </div>
+          
+          <div class="mt-4 pt-3 border-t flex justify-end">
+            ${hasPhone ? `
+              <button onclick="openWhatsApp('${c.phone.replace(/'/g, "\\'")}', '${c.displayName.replace(/'/g, "\\'")}')" 
+                      class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1">
+                💬 WhatsApp
+              </button>
+            ` : `<span class="text-xs text-slate-400">No Tel</span>`}
           </div>
         `;
         container.appendChild(card);
