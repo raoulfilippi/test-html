@@ -8,31 +8,31 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
-<body class="bg-slate-100 min-h-screen p-4 md:p-8">
-  <div class="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-md">
+<body class="bg-slate-100 min-h-screen p-2 sm:p-4 md:p-8">
+  <div class="max-w-6xl mx-auto bg-white p-4 sm:p-6 rounded-xl shadow-md">
     
     <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b pb-4 gap-4">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4 gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">Contatti Casa Mare Nazioni</h1>
-        <p class="text-xs text-slate-500 mt-1">Gestione contatti, WhatsApp e invii email programmati</p>
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-800">Contatti Casa Mare Nazioni</h1>
+        <p class="text-xs text-slate-500 mt-0.5">Gestione contatti, WhatsApp e invii email programmati</p>
       </div>
-      <button id="authBtn" onclick="handleAuth()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-lg transition shadow-sm">
+      <button id="authBtn" onclick="handleAuth()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-lg transition shadow-sm text-sm">
         Connetti Google
       </button>
     </div>
 
     <!-- Status Box -->
-    <div id="status" class="hidden mb-6 p-4 rounded-lg bg-slate-50 text-slate-700 border text-sm"></div>
+    <div id="status" class="hidden mb-6 p-3 sm:p-4 rounded-lg bg-slate-50 text-slate-700 border text-xs sm:text-sm"></div>
 
     <!-- Control Panel -->
-    <div id="controlsPanel" class="hidden mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
+    <div id="controlsPanel" class="hidden mb-6 bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 flex flex-col lg:flex-row gap-3 lg:gap-4 justify-between items-stretch lg:items-center">
       
       <!-- Barra di ricerca con tasto Reset -->
-      <div class="flex-1">
+      <div class="w-full lg:flex-1">
         <label class="block text-xs font-semibold text-slate-500 mb-1">Cerca</label>
         <div class="relative">
-          <input type="text" id="searchInput" oninput="render()" placeholder="Cerca per nome, email, telefono o nazione..." 
+          <input type="text" id="searchInput" oninput="render()" placeholder="Cerca nome, email, tel..." 
                  class="w-full pl-3 pr-8 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
           <button id="clearSearchBtn" onclick="clearSearch()" type="button" 
                   class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 font-bold text-xs p-1 rounded-full leading-none">
@@ -41,49 +41,52 @@
         </div>
       </div>
 
-      <!-- Ordinamento -->
-      <div class="w-full lg:w-40">
-        <label class="block text-xs font-semibold text-slate-500 mb-1">Ordina per</label>
-        <select id="sortSelect" onchange="render()" class="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          <option value="name_asc">Nome (A-Z)</option>
-          <option value="name_desc">Nome (Z-A)</option>
-          <option value="lastname_asc">Cognome (A-Z)</option>
-          <option value="country_asc">Nazione (A-Z)</option>
-        </select>
-      </div>
+      <!-- Filtri Affiancati su Mobile -->
+      <div class="grid grid-cols-2 gap-2 lg:flex lg:w-auto">
+        <!-- Ordinamento -->
+        <div class="w-full lg:w-40">
+          <label class="block text-xs font-semibold text-slate-500 mb-1">Ordina per</label>
+          <select id="sortSelect" onchange="render()" class="w-full px-2 sm:px-3 py-2 border rounded-lg text-xs sm:text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="name_asc">Nome (A-Z)</option>
+            <option value="name_desc">Nome (Z-A)</option>
+            <option value="lastname_asc">Cognome (A-Z)</option>
+            <option value="country_asc">Nazione (A-Z)</option>
+          </select>
+        </div>
 
-      <!-- Filtro Nazione -->
-      <div class="w-full lg:w-40">
-        <label class="block text-xs font-semibold text-slate-500 mb-1">Filtra Nazione</label>
-        <select id="countryFilter" onchange="render()" class="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          <option value="ALL">Tutte le Nazioni</option>
-        </select>
+        <!-- Filtro Nazione -->
+        <div class="w-full lg:w-40">
+          <label class="block text-xs font-semibold text-slate-500 mb-1">Filtra Nazione</label>
+          <select id="countryFilter" onchange="render()" class="w-full px-2 sm:px-3 py-2 border rounded-lg text-xs sm:text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="ALL">Tutte le Nazioni</option>
+          </select>
+        </div>
       </div>
 
       <!-- Export & Schedule Buttons -->
-      <div class="flex items-end gap-2 pt-1 lg:pt-0">
-        <button onclick="openEmailModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-2.5 rounded-lg transition shadow-sm flex items-center justify-center gap-1">
-          ✉️ Programma Email
+      <div class="grid grid-cols-2 gap-2 pt-1 lg:pt-0 lg:flex lg:w-auto">
+        <button onclick="openEmailModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-2.5 rounded-lg transition shadow-sm flex items-center justify-center gap-1">
+          ✉️ <span class="truncate">Programma Email</span>
         </button>
-        <button onclick="exportData('xlsx')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2.5 rounded-lg transition shadow-sm flex items-center justify-center gap-1">
+        <button onclick="exportData('xlsx')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2.5 rounded-lg transition shadow-sm flex items-center justify-center gap-1">
           📊 Excel
         </button>
       </div>
     </div>
 
     <!-- Lista Contatti Grid -->
-    <div id="contactsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"></div>
+    <div id="contactsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-8"></div>
 
     <!-- Sezione Invii Programmati -->
     <div class="border-t pt-6 mt-6">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-bold text-slate-800">📋 Invii Email Programmati</h2>
-        <button onclick="fetchScheduledEmails()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-semibold transition">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+        <h2 class="text-base sm:text-lg font-bold text-slate-800">📋 Invii Email Programmati</h2>
+        <button onclick="fetchScheduledEmails()" class="w-full sm:w-auto text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 sm:py-1.5 rounded-lg font-semibold transition text-center">
           🔄 Aggiorna Lista
         </button>
       </div>
       <div class="overflow-x-auto border rounded-xl bg-slate-50">
-        <table class="w-full text-left text-xs text-slate-600">
+        <table class="w-full text-left text-xs text-slate-600 min-w-[600px]">
           <thead class="bg-slate-200 text-slate-700 uppercase text-[10px] font-bold">
             <tr>
               <th class="p-3">Nome</th>
@@ -106,34 +109,34 @@
   </div>
 
   <!-- MODAL PROGRAMMAZIONE EMAIL -->
-  <div id="emailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 relative">
-      <h2 class="text-xl font-bold text-slate-800 mb-4">✉️ Programma Invio Email</h2>
+  <div id="emailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-5 sm:p-6 relative max-h-[90vh] overflow-y-auto">
+      <h2 class="text-lg sm:text-xl font-bold text-slate-800 mb-3">✉️ Programma Invio Email</h2>
       
       <p class="text-xs text-slate-500 mb-4">
         L'email verrà inviata automaticamente ai <strong id="modalContactCount" class="text-indigo-600">0</strong> contatti attualmente visibili nella dashboard alla data e ora selezionate.
       </p>
 
-      <div class="space-y-4">
+      <div class="space-y-3 sm:space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Data e Ora di Invio</label>
-          <input type="datetime-local" id="sendDateTimeInput" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500">
+          <input type="datetime-local" id="sendDateTimeInput" class="w-full border rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500">
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Oggetto Email</label>
-          <input type="text" id="subjectInput" placeholder="Es. Comunicazione importante da Casa Mare Nazioni" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="subjectInput" placeholder="Es. Comunicazione importante da Casa Mare Nazioni" class="w-full border rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500">
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Messaggio (Usa {NOME} per personalizzare)</label>
-          <textarea id="messageInput" rows="4" placeholder="Gentile {NOME}, le ricordiamo la prenotazione..." class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+          <textarea id="messageInput" rows="4" placeholder="Gentile {NOME}, le ricordiamo la prenotazione..." class="w-full border rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
         </div>
       </div>
 
-      <div class="flex justify-end gap-3 mt-6 border-t pt-4">
-        <button onclick="closeEmailModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
-        <button id="sendScheduleBtn" onclick="submitEmailSchedule()" class="px-4 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm">🚀 Programma Invio</button>
+      <div class="flex justify-end gap-2 sm:gap-3 mt-6 border-t pt-4">
+        <button onclick="closeEmailModal()" class="px-3 sm:px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Annulla</button>
+        <button id="sendScheduleBtn" onclick="submitEmailSchedule()" class="px-3 sm:px-4 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm">🚀 Programma Invio</button>
       </div>
     </div>
   </div>
@@ -143,7 +146,6 @@
     const SCOPES = 'https://www.googleapis.com/auth/contacts.readonly';
     const SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw0xBplafCw5cR3yxepDw8vN1ZTt9ZxAz90wlmIi5j32y1Y-4vPInouuz2VwoyWpPp8/exec';
 
-    // MAPPATURA PREFISSI MONDIALI COMPLETA
     const WORLD_PREFIXES = [
       { code: '+93', name: 'Afghanistan', flag: '🇦🇫' },
       { code: '+355', name: 'Albania', flag: '🇦🇱' },
@@ -248,7 +250,8 @@
       { code: '+7', name: 'Kazakistan / Russia', flag: '🇰🇿' },
       { code: '+254', name: 'Kenya', flag: '🇰🇪' },
       { code: '+686', name: 'Kiribati', flag: '🇰🇮' },
-      { code: '+383', name: 'Kosovo', flag: '🇽🇰' },
+      { code: '+850', name: 'Corea del Nord', flag: '🇰🇵' },
+      { code: '+82', name: 'Corea del Sud', flag: '🇰🇷' },
       { code: '+965', name: 'Kuwait', flag: '🇰🇼' },
       { code: '+996', name: 'Kirghizistan', flag: '🇰🇬' },
       { code: '+856', name: 'Laos', flag: '🇱🇦' },
@@ -268,11 +271,13 @@
       { code: '+960', name: 'Maldive', flag: '🇲🇻' },
       { code: '+223', name: 'Mali', flag: '🇲🇱' },
       { code: '+356', name: 'Malta', flag: '🇲🇹' },
+      { code: '+692', name: 'Isole Marshall', flag: '🇲🇭' },
       { code: '+596', name: 'Martinica', flag: '🇲🇶' },
       { code: '+222', name: 'Mauritania', flag: '🇲🇷' },
       { code: '+230', name: 'Mauritius', flag: '🇲🇺' },
-      { code: '+269', name: 'Mayotte', flag: '🇾🇹' },
+      { code: '+262', name: 'Mayotte / Réunion', flag: '🇾🇹' },
       { code: '+52', name: 'Messico', flag: '🇲🇽' },
+      { code: '+691', name: 'Micronesia', flag: '🇫🇲' },
       { code: '+373', name: 'Moldavia', flag: '🇲🇩' },
       { code: '+377', name: 'Monaco', flag: '🇲🇨' },
       { code: '+976', name: 'Mongolia', flag: '🇲🇳' },
@@ -282,6 +287,7 @@
       { code: '+258', name: 'Mozambico', flag: '🇲🇿' },
       { code: '+95', name: 'Myanmar', flag: '🇲🇲' },
       { code: '+264', name: 'Namibia', flag: '🇳🇦' },
+      { code: '+674', name: 'Nauru', flag: '🇳🇷' },
       { code: '+977', name: 'Nepal', flag: '🇳🇵' },
       { code: '+31', name: 'Paesi Bassi', flag: '🇳🇱' },
       { code: '+687', name: 'Nuova Caledonia', flag: '🇳🇨' },
@@ -289,7 +295,6 @@
       { code: '+505', name: 'Nicaragua', flag: '🇳🇮' },
       { code: '+227', name: 'Niger', flag: '🇳🇪' },
       { code: '+234', name: 'Nigeria', flag: '🇳🇬' },
-      { code: '+850', name: 'Corea del Nord', flag: '🇰🇵' },
       { code: '+47', name: 'Norvegia', flag: '🇳🇴' },
       { code: '+968', name: 'Oman', flag: '🇴🇲' },
       { code: '+92', name: 'Pakistan', flag: '🇵🇰' },
@@ -305,9 +310,12 @@
       { code: '+1787', name: 'Porto Rico', flag: '🇵🇷' },
       { code: '+1939', name: 'Porto Rico', flag: '🇵🇷' },
       { code: '+974', name: 'Qatar', flag: '🇶🇦' },
-      { code: '+262', name: 'Réunion', flag: '🇷🇪' },
       { code: '+40', name: 'Romania', flag: '🇷🇴' },
       { code: '+250', name: 'Ruanda', flag: '🇷🇼' },
+      { code: '+1869', name: 'Saint Kitts e Nevis', flag: '🇰🇳' },
+      { code: '+1758', name: 'Santa Lucia', flag: '🇱🇨' },
+      { code: '+1784', name: 'Saint Vincent e Grenadine', flag: '🇻🇨' },
+      { code: '+685', name: 'Samoa', flag: '🇼🇸' },
       { code: '+378', name: 'San Marino', flag: '🇸🇲' },
       { code: '+239', name: 'São Tomé e Príncipe', flag: '🇸🇹' },
       { code: '+966', name: 'Arabia Saudita', flag: '🇸🇦' },
@@ -316,13 +324,11 @@
       { code: '+248', name: 'Seychelles', flag: '🇸🇨' },
       { code: '+232', name: 'Sierra Leone', flag: '🇸🇱' },
       { code: '+65', name: 'Singapore', flag: '🇸🇬' },
-      { code: '+420', name: 'Rep. Ceca', flag: '🇨🇿' },
       { code: '+421', name: 'Slovacchia', flag: '🇸🇰' },
       { code: '+386', name: 'Slovenia', flag: '🇸🇮' },
       { code: '+677', name: 'Isole Salomone', flag: '🇸🇧' },
       { code: '+252', name: 'Somalia', flag: '🇸🇴' },
       { code: '+27', name: 'Sudafrica', flag: '🇿🇦' },
-      { code: '+82', name: 'Corea del Sud', flag: '🇰🇷' },
       { code: '+211', name: 'Sud Sudan', flag: '🇸🇸' },
       { code: '+34', name: 'Spagna', flag: '🇪🇸' },
       { code: '+94', name: 'Sri Lanka', flag: '🇱🇰' },
@@ -336,205 +342,252 @@
       { code: '+992', name: 'Tagikistan', flag: '🇹🇯' },
       { code: '+255', name: 'Tanzania', flag: '🇹🇿' },
       { code: '+66', name: 'Thailandia', flag: '🇹🇭' },
+      { code: '+670', name: 'Timor Est', flag: '🇹🇱' },
       { code: '+228', name: 'Togo', flag: '🇹🇬' },
       { code: '+676', name: 'Tonga', flag: '🇹🇴' },
       { code: '+1868', name: 'Trinidad e Tobago', flag: '🇹🇹' },
       { code: '+216', name: 'Tunisia', flag: '🇹🇳' },
       { code: '+90', name: 'Turchia', flag: '🇹🇷' },
       { code: '+993', name: 'Turkmenistan', flag: '🇹🇲' },
+      { code: '+1649', name: 'Turks e Caicos', flag: '🇹🇨' },
+      { code: '+688', name: 'Tuvalu', flag: '🇹🇻' },
       { code: '+256', name: 'Uganda', flag: '🇺🇬' },
       { code: '+380', name: 'Ucraina', flag: '🇺🇦' },
       { code: '+971', name: 'Emirati Arabi Uniti', flag: '🇦🇪' },
       { code: '+44', name: 'Regno Unito', flag: '🇬🇧' },
-      { code: '+1', name: 'Stati Uniti / Canada', flag: '🇺🇸' },
+      { code: '+1', name: 'USA / Canada', flag: '🇺🇸' },
       { code: '+598', name: 'Uruguay', flag: '🇺🇾' },
       { code: '+998', name: 'Uzbekistan', flag: '🇺🇿' },
       { code: '+678', name: 'Vanuatu', flag: '🇻🇺' },
-      { code: '+3906698', name: 'Città del Vaticano', flag: '🇻🇦' },
+      { code: '+379', name: 'Città del Vaticano', flag: '🇻🇦' },
       { code: '+58', name: 'Venezuela', flag: '🇻🇪' },
       { code: '+84', name: 'Vietnam', flag: '🇻🇳' },
+      { code: '+1340', name: 'Isole Vergini Americane', flag: '🇻🇮' },
       { code: '+967', name: 'Yemen', flag: '🇾🇪' },
       { code: '+260', name: 'Zambia', flag: '🇿🇲' },
       { code: '+263', name: 'Zimbabwe', flag: '🇿🇼' }
-    ];
-
-    // Ordiniamo per lunghezza decrescente del prefisso per trovare prima i prefissi più specifici
-    const SORTED_PREFIXES = [...WORLD_PREFIXES].sort((a, b) => b.code.length - a.code.length);
+    ].sort((a,b) => b.code.length - a.code.length);
 
     let tokenClient;
-    let rawContacts = [];
-    let processedContacts = [];
+    let accessToken = null;
+    let allContacts = [];
     let currentFilteredContacts = [];
 
-    function getCountryFromPhone(phone) {
-      if (!phone || phone === 'Nessun Telefono') return { name: 'Italia', flag: '🇮🇹' };
-      const cleaned = phone.replace(/[\s\-\(\)]/g, '');
-      
-      // Se non inizia con + o 00, si assume Italia di default
-      if (!cleaned.startsWith('+') && !cleaned.startsWith('00')) return { name: 'Italia', flag: '🇮🇹' };
-      
-      let num = cleaned;
-      if (num.startsWith('00')) num = '+' + num.slice(2);
-
-      const matched = SORTED_PREFIXES.find(item => num.startsWith(item.code));
-      if (matched) {
-        return { name: matched.name, flag: matched.flag };
-      }
-
-      return { name: 'Estero / Altro', flag: '🌐' };
-    }
-
-    function windowOnLoad() {
+    function initGoogleAuth() {
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
-        hint: 'casamarenazioni@gmail.com',
-        callback: async (tokenResponse) => {
-          if (tokenResponse.error) {
-            showStatus('Errore autenticazione: ' + tokenResponse.error, true);
+        callback: async (response) => {
+          if (response.error) {
+            showStatus("Errore durante l'autenticazione: " + response.error, true);
             return;
           }
-          showStatus('Autenticato! Recupero contatti...');
-          await fetchContacts(tokenResponse.access_token);
+          accessToken = response.access_token;
+          showStatus("Autenticazione riuscita! Caricamento contatti in corso...", false);
+          document.getElementById('authBtn').innerText = "Riconnetti";
+          await fetchAllContacts();
         },
       });
-      fetchScheduledEmails();
     }
 
-    window.onload = windowOnLoad;
+    window.onload = () => {
+      initGoogleAuth();
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById('sendDateTimeInput').value = now.toISOString().slice(0, 16);
+    };
 
     function handleAuth() {
       tokenClient.requestAccessToken({ prompt: 'consent' });
     }
 
-    async function fetchContacts(accessToken) {
+    function showStatus(msg, isError) {
+      const el = document.getElementById('status');
+      el.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700', 'border-red-200', 'border-green-200');
+      if (isError) {
+        el.classList.add('bg-red-50', 'text-red-700', 'border-red-200');
+      } else {
+        el.classList.add('bg-green-50', 'text-green-700', 'border-green-200');
+      }
+      el.innerText = msg;
+    }
+
+    async function fetchAllContacts() {
+      allContacts = [];
+      let nextPageToken = '';
       try {
-        const response = await fetch(
-          'https://people.googleapis.com/v1/people/me/connections?pageSize=1000&personFields=names,emailAddresses,phoneNumbers',
-          { headers: { 'Authorization': `Bearer ${accessToken}` } }
-        );
-        const data = await response.json();
-        rawContacts = data.connections || [];
-        processContacts();
-        populateCountryFilter();
+        do {
+          let url = `https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,phoneNumbers&pageSize=1000`;
+          if (nextPageToken) url += `&pageToken=${nextPageToken}`;
+          
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          const data = await res.json();
+          
+          if (data.connections) {
+            data.connections.forEach(person => {
+              const nameObj = person.names ? person.names[0] : {};
+              const displayName = nameObj.displayName || 'Senza Nome';
+              const givenName = nameObj.givenName || '';
+              const familyName = nameObj.familyName || '';
+
+              const emails = person.emailAddresses ? person.emailAddresses.map(e => e.value) : [];
+              const phones = person.phoneNumbers ? person.phoneNumbers.map(p => p.value) : [];
+
+              phones.forEach(rawPhone => {
+                const parsed = parsePhoneAndCountry(rawPhone);
+                allContacts.push({
+                  name: displayName,
+                  firstName: givenName,
+                  lastName: familyName,
+                  email: emails[0] || '',
+                  allEmails: emails,
+                  phone: parsed.cleanPhone,
+                  rawPhone: rawPhone,
+                  country: parsed.country,
+                  flag: parsed.flag,
+                  prefix: parsed.prefix
+                });
+              });
+            });
+          }
+          nextPageToken = data.nextPageToken;
+        } while (nextPageToken);
+
+        showStatus(`Caricati con successo ${allContacts.length} numeri/contatti!`, false);
         document.getElementById('controlsPanel').classList.remove('hidden');
+        populateCountryFilter();
         render();
+        fetchScheduledEmails();
       } catch (err) {
-        showStatus('Errore recupero contatti: ' + err.message, true);
+        showStatus("Errore nel recupero contatti: " + err.message, true);
       }
     }
 
-    function processContacts() {
-      processedContacts = rawContacts.map(person => {
-        const nameObj = person.names?.[0];
-        const displayName = nameObj?.displayName || 'Senza Nome';
-        const firstName = nameObj?.givenName || displayName;
-        const lastName = nameObj?.familyName || '';
-        const email = person.emailAddresses?.[0]?.value || 'Nessuna Email';
-        const phone = person.phoneNumbers?.[0]?.value || 'Nessun Telefono';
-        const country = getCountryFromPhone(phone);
-        return { displayName, firstName, lastName, email, phone, country };
-      });
+    function parsePhoneAndCountry(phoneStr) {
+      const clean = phoneStr.replace(/[^\d+]/g, '');
+      let country = 'Sconosciuta';
+      let flag = '🌐';
+      let prefix = '';
+
+      if (clean.startsWith('+') || clean.startsWith('00')) {
+        let formatted = clean.startsWith('00') ? '+' + clean.slice(2) : clean;
+        for (const p of WORLD_PREFIXES) {
+          if (formatted.startsWith(p.code)) {
+            country = p.name;
+            flag = p.flag;
+            prefix = p.code;
+            break;
+          }
+        }
+      } else {
+        country = 'Italia';
+        flag = '🇮🇹';
+        prefix = '+39';
+      }
+
+      return { cleanPhone: clean, country, flag, prefix };
     }
 
     function populateCountryFilter() {
       const select = document.getElementById('countryFilter');
-      const countries = Array.from(new Set(processedContacts.map(c => c.country.name))).sort();
       select.innerHTML = '<option value="ALL">Tutte le Nazioni</option>';
+      const countries = [...new Set(allContacts.map(c => c.country))].sort();
       countries.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c;
-        opt.textContent = c;
+        opt.innerText = c;
         select.appendChild(opt);
       });
     }
 
-    function openWhatsApp(phone, name) {
-      let digits = phone.replace(/[^\d+]/g, '');
-      if (digits.startsWith('00')) digits = '+' + digits.slice(2);
-      if (!digits.startsWith('+')) digits = '+39' + digits;
-      const text = encodeURIComponent(`Gentile ${name}, le scriviamo da Casa Mare Nazioni.`);
-      window.open(`https://wa.me/${digits.replace('+', '')}?text=${text}`, '_blank');
-    }
-
     function clearSearch() {
-      document.getElementById('searchInput').value = '';
+      const searchInput = document.getElementById('searchInput');
+      searchInput.value = '';
       render();
+      searchInput.focus();
     }
 
     function render() {
-      const searchInput = document.getElementById('searchInput');
-      const search = searchInput.value.toLowerCase().trim();
-      
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
       const clearBtn = document.getElementById('clearSearchBtn');
-      if (clearBtn) clearBtn.classList.toggle('hidden', searchInput.value.length === 0);
+      if (q.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
 
-      const sortType = document.getElementById('sortSelect').value;
-      const selectedCountry = document.getElementById('countryFilter').value;
+      const sortVal = document.getElementById('sortSelect').value;
+      const countryVal = document.getElementById('countryFilter').value;
 
-      currentFilteredContacts = processedContacts.filter(c => {
-        const matchesSearch = c.displayName.toLowerCase().includes(search) ||
-                              c.email.toLowerCase().includes(search) ||
-                              c.phone.toLowerCase().includes(search) ||
-                              c.country.name.toLowerCase().includes(search);
-        const matchesCountry = selectedCountry === 'ALL' || c.country.name === selectedCountry;
-        return matchesSearch && matchesCountry;
+      let filtered = allContacts.filter(c => {
+        const matchQ = c.name.toLowerCase().includes(q) || 
+                       c.email.toLowerCase().includes(q) || 
+                       c.phone.includes(q);
+        const matchC = (countryVal === 'ALL') || (c.country === countryVal);
+        return matchQ && matchC;
       });
 
-      currentFilteredContacts.sort((a, b) => {
-        if (sortType === 'name_asc') return a.displayName.localeCompare(b.displayName);
-        if (sortType === 'name_desc') return b.displayName.localeCompare(a.displayName);
-        if (sortType === 'lastname_asc') return (a.lastName || a.displayName).localeCompare(b.lastName || b.displayName);
-        if (sortType === 'country_asc') return a.country.name.localeCompare(b.country.name);
+      filtered.sort((a, b) => {
+        if (sortVal === 'name_asc') return a.name.localeCompare(b.name);
+        if (sortVal === 'name_desc') return b.name.localeCompare(a.name);
+        if (sortVal === 'lastname_asc') return (a.lastName || a.name).localeCompare(b.lastName || b.name);
+        if (sortVal === 'country_asc') return a.country.localeCompare(b.country);
         return 0;
       });
+
+      currentFilteredContacts = filtered;
 
       const container = document.getElementById('contactsList');
       container.innerHTML = '';
 
-      if (currentFilteredContacts.length === 0) {
-        showStatus('Nessun contatto corrisponde ai filtri.');
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400">Nessun contatto trovato.</div>`;
         return;
       }
 
-      showStatus(`Visualizzati ${currentFilteredContacts.length} su ${processedContacts.length} contatti.`);
-
-      currentFilteredContacts.forEach(c => {
+      filtered.forEach(c => {
+        const cleanDigits = c.phone.replace(/\D/g, '');
+        const waUrl = `https://wa.me/${cleanDigits}`;
+        
         const card = document.createElement('div');
-        card.className = 'p-4 border rounded-xl bg-slate-50 hover:bg-white hover:shadow-md transition flex flex-col justify-between border-slate-200';
-        const hasPhone = c.phone && c.phone !== 'Nessun Telefono';
-
+        card.className = "bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between h-full";
         card.innerHTML = `
           <div>
-            <div class="flex justify-between items-start mb-2">
-              <h3 class="font-semibold text-slate-900 leading-snug">${c.displayName}</h3>
-              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 flex items-center gap-1 shrink-0">
-                ${c.country.flag} ${c.country.name}
+            <div class="flex justify-between items-start gap-2 mb-2">
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base leading-snug break-words">${escapeHtml(c.name)}</h3>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 border text-slate-600 font-medium whitespace-nowrap shrink-0">
+                ${c.flag} ${c.country}
               </span>
             </div>
-            <p class="text-xs text-slate-600 mt-2">📧 ${c.email}</p>
-            <p class="text-xs text-slate-600 mt-1">📞 <span class="font-mono">${c.phone}</span></p>
+            
+            <div class="space-y-1 my-3 text-xs text-slate-600">
+              <p class="flex items-center gap-1.5 font-mono">
+                📞 <span class="select-all">${escapeHtml(c.phone)}</span>
+              </p>
+              ${c.email ? `
+                <p class="flex items-center gap-1.5 break-all text-slate-500">
+                  ✉️ <a href="mailto:${escapeHtml(c.email)}" class="hover:underline text-indigo-600">${escapeHtml(c.email)}</a>
+                </p>
+              ` : '<p class="text-slate-300 italic">Nessuna email</p>'}
+            </div>
           </div>
-          <div class="mt-4 pt-3 border-t flex justify-end">
-            ${hasPhone ? `
-              <button onclick="openWhatsApp('${c.phone.replace(/'/g, "\\'")}', '${c.displayName.replace(/'/g, "\\'")}')" 
-                      class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow-sm">
-                💬 WhatsApp
-              </button>
-            ` : `<span class="text-xs text-slate-400">No Tel</span>`}
+
+          <div class="pt-3 border-t flex gap-2">
+            <a href="${waUrl}" target="_blank" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold py-2 rounded-lg text-center transition flex items-center justify-center gap-1 shadow-sm">
+              💬 WhatsApp
+            </a>
           </div>
         `;
         container.appendChild(card);
       });
     }
 
-    // GESTIONE MODAL EMAIL
     function openEmailModal() {
       if (currentFilteredContacts.length === 0) {
-        alert("Nessun contatto visibile da selezionare.");
+        alert("Nessun contatto selezionato o visibile.");
         return;
       }
-      document.getElementById('modalContactCount').textContent = currentFilteredContacts.length;
+      document.getElementById('modalContactCount').innerText = currentFilteredContacts.length;
       document.getElementById('emailModal').classList.remove('hidden');
     }
 
@@ -543,103 +596,129 @@
     }
 
     async function submitEmailSchedule() {
-      const datetime = document.getElementById('sendDateTimeInput').value;
+      const dateTimeVal = document.getElementById('sendDateTimeInput').value;
       const subject = document.getElementById('subjectInput').value.trim();
       const message = document.getElementById('messageInput').value.trim();
-      const btn = document.getElementById('sendScheduleBtn');
 
-      if (!datetime || !subject || !message) {
-        alert("Compila tutti i campi (Data e Ora, Oggetto e Messaggio).");
+      if (!dateTimeVal || !subject || !message) {
+        alert("Per favore riempi tutti i campi (Data/Ora, Oggetto e Messaggio).");
         return;
       }
 
-      btn.disabled = true;
-      btn.textContent = "Invio in corso...";
+      const recipients = currentFilteredContacts
+        .filter(c => c.email && c.email.includes('@'))
+        .map(c => ({
+          name: c.firstName || c.name,
+          email: c.email,
+          country: c.country
+        }));
 
-      const contactsToSend = currentFilteredContacts.map(c => ({
-        name: c.displayName,
-        email: c.email,
-        country: c.country ? c.country.name : 'Italia'
-      }));
-
-      const formattedDate = datetime.replace('T', ' ');
+      if (recipients.length === 0) {
+        alert("Nessuno dei contatti visibili ha un indirizzo email valido.");
+        return;
+      }
 
       const payload = {
-        sendDate: formattedDate,
+        action: 'schedule',
+        sendAt: dateTimeVal,
         subject: subject,
         message: message,
-        contacts: contactsToSend
+        recipients: recipients
       };
+
+      const btn = document.getElementById('sendScheduleBtn');
+      btn.innerText = "Invio in corso...";
+      btn.disabled = true;
 
       try {
         await fetch(SCRIPT_WEB_APP_URL, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
-        alert(`Programmazione completata per ${currentFilteredContacts.length} contatti!`);
+        alert(`Programmazione inviata con successo per ${recipients.length} contatti!`);
         closeEmailModal();
         setTimeout(fetchScheduledEmails, 1500);
       } catch (err) {
         alert("Errore nell'invio della programmazione: " + err.message);
       } finally {
+        btn.innerText = "🚀 Programma Invio";
         btn.disabled = false;
-        btn.textContent = "🚀 Programma Invio";
       }
     }
 
-    // CARICA INVII PROGRAMMATI DAL FOGLIO GOOGLE
     async function fetchScheduledEmails() {
       const tbody = document.getElementById('scheduledTableBody');
+      tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Caricamento in corso...</td></tr>`;
+
       try {
-        const response = await fetch(SCRIPT_WEB_APP_URL);
-        const data = await response.json();
-        
+        const res = await fetch(`${SCRIPT_WEB_APP_URL}?action=getScheduled`);
+        const data = await res.json();
+
         if (!data || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Nessuna email programmata trovata.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Nessun invio programmato presente.</td></tr>`;
           return;
         }
 
         tbody.innerHTML = '';
-        data.forEach(row => {
+        data.reverse().forEach(row => {
+          let statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">In attesa</span>`;
+          if (row.status === 'SENT') {
+            statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Inviato</span>`;
+          } else if (row.status && row.status.startsWith('ERROR')) {
+            statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800">Errore</span>`;
+          }
+
           const tr = document.createElement('tr');
-          tr.className = 'border-b hover:bg-slate-100/50';
+          tr.className = "hover:bg-slate-100/50";
           tr.innerHTML = `
-            <td class="p-3 font-medium text-slate-800">${row.nome || row.Nome || '-'}</td>
-            <td class="p-3 text-slate-600">${row.email || row.Email || '-'}</td>
-            <td class="p-3 text-slate-600">${row.nazione || row.Nazione || '-'}</td>
-            <td class="p-3 text-slate-600 font-mono">${row.dataInvio || row['Data Invio'] || '-'}</td>
-            <td class="p-3 text-slate-600 max-w-xs truncate">${row.oggetto || row.Oggetto || '-'}</td>
-            <td class="p-3">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${row.stato === 'INVIATO' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                ${row.stato || row.Stato || 'IN ATTESA'}
-              </span>
-            </td>
+            <td class="p-3 font-medium text-slate-800">${escapeHtml(row.name)}</td>
+            <td class="p-3 text-slate-500">${escapeHtml(row.email)}</td>
+            <td class="p-3">${escapeHtml(row.country || '-')}</td>
+            <td class="p-3 text-slate-700 font-mono">${escapeHtml(row.sendAt)}</td>
+            <td class="p-3 max-w-xs truncate">${escapeHtml(row.subject)}</td>
+            <td class="p-3">${statusBadge}</td>
           `;
           tbody.appendChild(tr);
         });
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Errore nel caricamento della tabella invii.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Errore nel caricamento degli invii.</td></tr>`;
       }
     }
 
     function exportData(type) {
-      const exportList = currentFilteredContacts.map(c => ({
-        'Nome Completo': c.displayName, 'Email': c.email, 'Telefono': c.phone, 'Nazione': c.country.name
+      if (currentFilteredContacts.length === 0) {
+        alert("Nessun dato da esportare.");
+        return;
+      }
+
+      const exportRows = currentFilteredContacts.map(c => ({
+        "Nome Completo": c.name,
+        "Nome": c.firstName,
+        "Cognome": c.lastName,
+        "Telefono": c.phone,
+        "Nazione": c.country,
+        "Prefisso": c.prefix,
+        "Email": c.email
       }));
-      const worksheet = XLSX.utils.json_to_sheet(exportList);
+
+      const worksheet = XLSX.utils.json_to_sheet(exportRows);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Contatti");
-      XLSX.writeFile(workbook, `Contatti_Casa_Mare_Nazioni.${type}`);
+
+      XLSX.writeFile(workbook, `Contatti_CasaMareNazioni_${new Date().toISOString().slice(0,10)}.xlsx`);
     }
 
-    function showStatus(msg, isError = false) {
-      const el = document.getElementById('status');
-      el.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-slate-50', 'text-slate-700');
-      el.classList.add(isError ? 'bg-red-50' : 'bg-slate-50', isError ? 'text-red-700' : 'text-slate-700');
-      el.textContent = msg;
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
   </script>
 </body>
