@@ -395,7 +395,7 @@
       initGoogleAuth();
       const now = new Date();
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-      document.getElementById('sendDateTimeInput').value = now.toISOString().slice(0, 16);
+      document.getElementById('sendDateTimeInput').value = now.toISOString().slice(0, 10);
     };
 
     function handleAuth() {
