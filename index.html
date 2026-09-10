@@ -77,6 +77,33 @@
     <!-- Lista Contatti Grid -->
     <div id="contactsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-8"></div>
 
+    <!-- Sezione Prossimi Compleanni -->
+    <div class="border-t pt-6 mt-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+        <h2 class="text-base sm:text-lg font-bold text-slate-800">🎂 Prossimi Compleanni in Arrivo</h2>
+        <button onclick="fetchUpcomingBirthdays()" class="w-full sm:w-auto text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 sm:py-1.5 rounded-lg font-semibold transition text-center">
+          🔄 Aggiorna Compleanni
+        </button>
+      </div>
+      <div class="overflow-x-auto border rounded-xl bg-slate-50">
+        <table class="w-full text-left text-xs text-slate-600 min-w-[500px]">
+          <thead class="bg-slate-200 text-slate-700 uppercase text-[10px] font-bold">
+            <tr>
+              <th class="p-3">Nome</th>
+              <th class="p-3">Email</th>
+              <th class="p-3">Data Compleanno</th>
+              <th class="p-3">Mancano</th>
+            </tr>
+          </thead>
+          <tbody id="birthdaysTableBody" class="divide-y divide-slate-200">
+            <tr>
+              <td colspan="4" class="p-4 text-center text-slate-400">Caricamento in corso...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Sezione Invii Programmati -->
     <div class="border-t pt-6 mt-6">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
@@ -119,10 +146,9 @@
 
       <div class="space-y-3 sm:space-y-4">
         <div>
-<div>
-  <label class="block text-xs font-semibold text-slate-600 mb-1">Data di Invio</label>
-  <input type="date" id="sendDateTimeInput" class="w-full border rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500">
-</div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Data di Invio</label>
+          <input type="date" id="sendDateTimeInput" class="w-full border rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500">
+        </div>
 
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Oggetto Email</label>
@@ -396,6 +422,7 @@
       const now = new Date();
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById('sendDateTimeInput').value = now.toISOString().slice(0, 10);
+      fetchUpcomingBirthdays();
     };
 
     function handleAuth() {
@@ -632,7 +659,6 @@
       btn.disabled = true;
 
       try {
-        // Usa text/plain per garantire che il browser non elimini il corpo della richiesta in no-cors
         await fetch(SCRIPT_WEB_APP_URL, {
           method: 'POST',
           mode: 'no-cors',
@@ -648,6 +674,45 @@
       } finally {
         btn.innerText = "🚀 Programma Invio";
         btn.disabled = false;
+      }
+    }
+
+    async function fetchUpcomingBirthdays() {
+      const tbody = document.getElementById('birthdaysTableBody');
+      tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Caricamento in corso...</td></tr>`;
+
+      try {
+        const res = await fetch(`${SCRIPT_WEB_APP_URL}?action=birthdays`);
+        const compleanni = await res.json();
+
+        if (!compleanni || compleanni.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Nessun compleanno imminente trovato nei contatti.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = '';
+        compleanni.forEach(c => {
+          let badgeInfo = '';
+          if (c.giorniMancanti === 0) {
+            badgeInfo = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800">Oggi! 🎂</span>`;
+          } else if (c.giorniMancanti === 1) {
+            badgeInfo = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Domani</span>`;
+          } else {
+            badgeInfo = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">tra ${c.giorniMancanti} giorni</span>`;
+          }
+
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-100/50";
+          tr.innerHTML = `
+            <td class="p-3 font-medium text-slate-800">${escapeHtml(c.nome)}</td>
+            <td class="p-3 text-slate-500">${escapeHtml(c.email)}</td>
+            <td class="p-3 text-slate-700 font-mono">${escapeHtml(c.dataCompleanno)}</td>
+            <td class="p-3">${badgeInfo}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500">Errore nel caricamento dei compleanni.</td></tr>`;
       }
     }
 
